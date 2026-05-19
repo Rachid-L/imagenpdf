@@ -1,0 +1,166 @@
+<main class="app-shell">
+  <header class="app-header" aria-labelledby="app-title">
+    <div>
+      <p class="eyebrow">Conversion locale d'images en PDF</p>
+      <h1 id="app-title">ImagEnPDF</h1>
+      <p class="tagline">Transformez vos images en PDF, simplement.</p>
+    </div>
+
+    <p class="privacy-note">
+      Vos images restent sur votre appareil. Aucun fichier n’est envoyé sur un serveur.
+    </p>
+  </header>
+
+  <section class="workspace" aria-label="Creation du PDF">
+    <div
+      class="drop-zone"
+      [class.drop-zone--active]="isDraggingOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      <input
+        #fileInput
+        class="file-input"
+        type="file"
+        multiple
+        [accept]="acceptedFileTypes"
+        (change)="onFileSelection($event)"
+      >
+
+      <div class="drop-zone__content">
+        <span class="drop-zone__icon" aria-hidden="true">+</span>
+        <div>
+          <h2>Ajoutez vos images</h2>
+          <p>Glissez-déposez des fichiers JPG, PNG ou WEBP ici.</p>
+        </div>
+      </div>
+
+      <button class="button button--primary" type="button" (click)="fileInput.click()">
+        Ajouter des images
+      </button>
+    </div>
+
+    <div class="controls" aria-label="Parametres PDF">
+      <div class="segmented-group">
+        <span class="control-label">Orientation</span>
+        <label class="segmented-option">
+          <input type="radio" name="orientation" value="portrait" [(ngModel)]="orientation">
+          <span>Portrait</span>
+        </label>
+        <label class="segmented-option">
+          <input type="radio" name="orientation" value="landscape" [(ngModel)]="orientation">
+          <span>Paysage</span>
+        </label>
+      </div>
+
+      <div class="segmented-group">
+        <span class="control-label">Format de page</span>
+        <label class="segmented-option">
+          <input type="radio" name="pageFormat" value="a4" [(ngModel)]="pageFormat">
+          <span>A4</span>
+        </label>
+        <label class="segmented-option">
+          <input type="radio" name="pageFormat" value="image" [(ngModel)]="pageFormat">
+          <span>Taille image</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <div>
+        <span class="image-count">{{ imageCountLabel }}</span>
+        <p>Les pages du PDF suivront l’ordre affiché.</p>
+      </div>
+
+      <div class="action-bar__buttons">
+        <button
+          class="button button--secondary"
+          type="button"
+          [disabled]="!hasImages || isGenerating"
+          (click)="clearImages()"
+        >
+          Tout supprimer
+        </button>
+        <button
+          class="button button--accent"
+          type="button"
+          [disabled]="!hasImages || isGenerating"
+          (click)="generatePdf()"
+        >
+          {{ isGenerating ? 'Génération...' : 'Générer le PDF' }}
+        </button>
+      </div>
+    </div>
+
+    <p
+      *ngIf="statusMessage"
+      class="status-message"
+      [class.status-message--success]="statusMessage.type === 'success'"
+      [class.status-message--error]="statusMessage.type === 'error'"
+      [class.status-message--info]="statusMessage.type === 'info'"
+      role="status"
+    >
+      {{ statusMessage.text }}
+    </p>
+
+    <section *ngIf="!hasImages" class="empty-state" aria-label="Aucune image importée">
+      <h2>Aucune image importée</h2>
+      <p>Ajoutez plusieurs images pour composer votre PDF page par page.</p>
+    </section>
+
+    <section
+      *ngIf="hasImages"
+      cdkDropList
+      class="image-grid"
+      aria-label="Images importees"
+      (cdkDropListDropped)="reorderImages($event)"
+    >
+      <article
+        *ngFor="let image of images; let index = index; trackBy: trackByImageId"
+        cdkDrag
+        class="image-card"
+      >
+        <div class="image-card__preview" cdkDragHandle>
+          <img [src]="image.previewUrl" [alt]="image.name">
+          <span class="drag-handle" aria-hidden="true">::</span>
+        </div>
+
+        <div class="image-card__body">
+          <div>
+            <h3 [title]="image.name">{{ image.name }}</h3>
+            <p>{{ formatFileSize(image.size) }} - {{ image.width }} x {{ image.height }} px</p>
+          </div>
+
+          <div class="image-card__actions">
+            <button
+              class="icon-button"
+              type="button"
+              aria-label="Monter l'image"
+              [disabled]="index === 0"
+              (click)="moveImage(index, -1)"
+            >
+              ↑
+            </button>
+            <button
+              class="icon-button"
+              type="button"
+              aria-label="Descendre l'image"
+              [disabled]="index === images.length - 1"
+              (click)="moveImage(index, 1)"
+            >
+              ↓
+            </button>
+            <button
+              class="text-button"
+              type="button"
+              (click)="removeImage(image.id)"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </section>
+</main>
