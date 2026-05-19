@@ -2,6 +2,8 @@
 
 ImagEnPDF est une application web statique qui transforme plusieurs images en un seul fichier PDF. Tout le traitement se fait dans le navigateur : aucune image n'est envoyée vers un serveur.
 
+https://imagenpdf.pages.dev/
+
 ## Fonctionnalites V1
 
 - Import multiple d'images JPG, JPEG, PNG et WEBP.
@@ -66,20 +68,6 @@ Dans Cloudflare Pages, créez un projet connecté au repository GitHub `imagenpd
 
 Important : les versions récentes d'Angular peuvent parfois produire un dossier `dist/imagenpdf/browser`. Cette configuration du projet génère `dist/imagenpdf`, vérifié après `npm run build`.
 
-## Création du repository GitHub
-
-Si le repository n'existe pas encore, créez un repository GitHub nommé `imagenpdf`, puis poussez le projet local :
-
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/VOTRE_COMPTE/imagenpdf.git
-git add .
-git commit -m "Initial commit"
-git push -u origin main
-```
-
-Remplacez `VOTRE_COMPTE` par votre nom d'utilisateur ou organisation GitHub.
 
 ## Roadmap V2
 
